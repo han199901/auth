@@ -37,4 +37,9 @@ public class UserRoleServiceImpl implements UserRoleService {
         });
         return roleList;
     }
+
+    @Override
+    public List<Role> getAllRole() {
+        return roleMapper.selectAll();
+    }
 }

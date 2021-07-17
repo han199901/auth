@@ -32,6 +32,7 @@
     delete from t_user
     where id = #{id,jdbcType=INTEGER}
   </delete>
+
   <insert id="insert" parameterType="com.han.auth.entity.User">
     insert into t_user (id, username, password, 
       is_account_non_locked, is_account_non_expired, is_credentials_non_expired, 

@@ -5,16 +5,18 @@ import com.han.auth.configuration.property.CookieConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Collections;
-import java.util.List;
+
 
 @Configuration
 @EnableWebSecurity
@@ -28,14 +30,14 @@ public class SecurityConfig {
         private RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
         private RestDetailsServiceImpl formDetailsService;
         private LoginAuthenticationEntryPoint loginAuthenticationEntryPoint;
-        private  RestAuthenticationProvider restAuthenticationProvider;
+        private RestAuthenticationProvider restAuthenticationProvider;
         private RestAccessDeniedHandler restAccessDeniedHandler;
         private RestLogoutSuccessHandler restLogoutSuccessHandler;
-
-
+        private CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource;
+        private CustomAccessDecisionManager customAccessDecisionManager;
 
         @Autowired
-        public SecurityConfigurerAdapter(RestAuthenticationFailureHandler restAuthenticationFailureHandler, RestAuthenticationSuccessHandler restAuthenticationSuccessHandler, RestDetailsServiceImpl formDetailsService, LoginAuthenticationEntryPoint loginAuthenticationEntryPoint, RestAuthenticationProvider restAuthenticationProvider, RestAccessDeniedHandler restAccessDeniedHandler, RestLogoutSuccessHandler restLogoutSuccessHandler) {
+        public SecurityConfigurerAdapter(RestAuthenticationFailureHandler restAuthenticationFailureHandler, RestAuthenticationSuccessHandler restAuthenticationSuccessHandler, RestDetailsServiceImpl formDetailsService, LoginAuthenticationEntryPoint loginAuthenticationEntryPoint, RestAuthenticationProvider restAuthenticationProvider, RestAccessDeniedHandler restAccessDeniedHandler, RestLogoutSuccessHandler restLogoutSuccessHandler, CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource, CustomAccessDecisionManager customAccessDecisionManager) {
             this.restAuthenticationFailureHandler = restAuthenticationFailureHandler;
             this.restAuthenticationSuccessHandler = restAuthenticationSuccessHandler;
             this.formDetailsService = formDetailsService;
@@ -43,7 +45,18 @@ public class SecurityConfig {
             this.restAuthenticationProvider = restAuthenticationProvider;
             this.restAccessDeniedHandler = restAccessDeniedHandler;
             this.restLogoutSuccessHandler = restLogoutSuccessHandler;
+            this.customFilterInvocationSecurityMetadataSource = customFilterInvocationSecurityMetadataSource;
+            this.customAccessDecisionManager = customAccessDecisionManager;
         }
+//        public SecurityConfigurerAdapter(RestAuthenticationFailureHandler restAuthenticationFailureHandler, RestAuthenticationSuccessHandler restAuthenticationSuccessHandler, RestDetailsServiceImpl formDetailsService, LoginAuthenticationEntryPoint loginAuthenticationEntryPoint, RestAuthenticationProvider restAuthenticationProvider, RestAccessDeniedHandler restAccessDeniedHandler, RestLogoutSuccessHandler restLogoutSuccessHandler) {
+//            this.restAuthenticationFailureHandler = restAuthenticationFailureHandler;
+//            this.restAuthenticationSuccessHandler = restAuthenticationSuccessHandler;
+//            this.formDetailsService = formDetailsService;
+//            this.loginAuthenticationEntryPoint = loginAuthenticationEntryPoint;
+//            this.restAuthenticationProvider = restAuthenticationProvider;
+//            this.restAccessDeniedHandler = restAccessDeniedHandler;
+//            this.restLogoutSuccessHandler = restLogoutSuccessHandler;
+//        }
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
@@ -54,18 +67,21 @@ public class SecurityConfig {
 //            String[] ignores = new String[securityIgnoreUrls.size()];
 
             http
+                    //动态获取角色权限
+                    .authorizeRequests()
+                    .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                        @Override
+                        public <O extends FilterSecurityInterceptor> O postProcess(O obj) {
+                            obj.setSecurityMetadataSource(customFilterInvocationSecurityMetadataSource);
+                            obj.setAccessDecisionManager(customAccessDecisionManager);
+                            return obj;
+                        }
+                    })
+                    .and()
                     .addFilterAt(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                     .exceptionHandling().authenticationEntryPoint(loginAuthenticationEntryPoint)
                     .and().authenticationProvider(restAuthenticationProvider)
                     .authorizeRequests()
-
-
-//                  我需要一个动态的角色权限
-
-//                    .antMatchers(securityIgnoreUrls.toArray(ignores)).permitAll()
-//                    .antMatchers("/api/admin/**").hasRole(RoleEnum.ADMIN.getName())
-//                    .antMatchers("/api/student/**").hasRole(RoleEnum.STUDENT.getName())
-//                    .antMatchers("/api/teacher/**").hasRole(RoleEnum.TEACHER.getName())
                     .anyRequest().permitAll()
                     .and().exceptionHandling().accessDeniedHandler(restAccessDeniedHandler)
                     .and().formLogin().successHandler(restAuthenticationSuccessHandler).failureHandler(restAuthenticationFailureHandler)

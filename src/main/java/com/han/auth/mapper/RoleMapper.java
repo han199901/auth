@@ -3,6 +3,8 @@ package com.han.auth.mapper;
 import com.han.auth.entity.Role;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface RoleMapper {
     int deleteByPrimaryKey(Integer id);
@@ -16,4 +18,6 @@ public interface RoleMapper {
     int updateByPrimaryKeySelective(Role record);
 
     int updateByPrimaryKey(Role record);
+
+    List<Role> selectAll();
 }

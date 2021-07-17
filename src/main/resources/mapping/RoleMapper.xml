@@ -15,6 +15,13 @@
     from t_role
     where id = #{id,jdbcType=INTEGER}
   </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_role
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from t_role
     where id = #{id,jdbcType=INTEGER}
