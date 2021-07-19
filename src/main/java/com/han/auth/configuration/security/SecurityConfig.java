@@ -26,18 +26,20 @@ public class SecurityConfig {
     public static class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
 
-        private RestAuthenticationFailureHandler restAuthenticationFailureHandler;
-        private RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
-        private RestDetailsServiceImpl formDetailsService;
-        private LoginAuthenticationEntryPoint loginAuthenticationEntryPoint;
-        private RestAuthenticationProvider restAuthenticationProvider;
-        private RestAccessDeniedHandler restAccessDeniedHandler;
-        private RestLogoutSuccessHandler restLogoutSuccessHandler;
-        private CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource;
-        private CustomAccessDecisionManager customAccessDecisionManager;
+        private final RestAuthenticationFailureHandler restAuthenticationFailureHandler;
+        private final RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
+        private final RestDetailsServiceImpl formDetailsService;
+        private final LoginAuthenticationEntryPoint loginAuthenticationEntryPoint;
+        private final RestAuthenticationProvider restAuthenticationProvider;
+        private final RestAccessDeniedHandler restAccessDeniedHandler;
+        private final RestLogoutSuccessHandler restLogoutSuccessHandler;
+        private final CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource;
+        private final CustomAccessDecisionManager customAccessDecisionManager;
+        private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+        private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
         @Autowired
-        public SecurityConfigurerAdapter(RestAuthenticationFailureHandler restAuthenticationFailureHandler, RestAuthenticationSuccessHandler restAuthenticationSuccessHandler, RestDetailsServiceImpl formDetailsService, LoginAuthenticationEntryPoint loginAuthenticationEntryPoint, RestAuthenticationProvider restAuthenticationProvider, RestAccessDeniedHandler restAccessDeniedHandler, RestLogoutSuccessHandler restLogoutSuccessHandler, CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource, CustomAccessDecisionManager customAccessDecisionManager) {
+        public SecurityConfigurerAdapter(RestAuthenticationFailureHandler restAuthenticationFailureHandler, RestAuthenticationSuccessHandler restAuthenticationSuccessHandler, RestDetailsServiceImpl formDetailsService, LoginAuthenticationEntryPoint loginAuthenticationEntryPoint, RestAuthenticationProvider restAuthenticationProvider, RestAccessDeniedHandler restAccessDeniedHandler, RestLogoutSuccessHandler restLogoutSuccessHandler, CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource, CustomAccessDecisionManager customAccessDecisionManager, JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
             this.restAuthenticationFailureHandler = restAuthenticationFailureHandler;
             this.restAuthenticationSuccessHandler = restAuthenticationSuccessHandler;
             this.formDetailsService = formDetailsService;
@@ -47,6 +49,8 @@ public class SecurityConfig {
             this.restLogoutSuccessHandler = restLogoutSuccessHandler;
             this.customFilterInvocationSecurityMetadataSource = customFilterInvocationSecurityMetadataSource;
             this.customAccessDecisionManager = customAccessDecisionManager;
+            this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+            this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         }
 //        public SecurityConfigurerAdapter(RestAuthenticationFailureHandler restAuthenticationFailureHandler, RestAuthenticationSuccessHandler restAuthenticationSuccessHandler, RestDetailsServiceImpl formDetailsService, LoginAuthenticationEntryPoint loginAuthenticationEntryPoint, RestAuthenticationProvider restAuthenticationProvider, RestAccessDeniedHandler restAccessDeniedHandler, RestLogoutSuccessHandler restLogoutSuccessHandler) {
 //            this.restAuthenticationFailureHandler = restAuthenticationFailureHandler;
@@ -77,6 +81,9 @@ public class SecurityConfig {
                             return obj;
                         }
                     })
+                    .and()
+                    .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                    .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(jwtAccessDeniedHandler)
                     .and()
                     .addFilterAt(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                     .exceptionHandling().authenticationEntryPoint(loginAuthenticationEntryPoint)
