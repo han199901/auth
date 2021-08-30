@@ -5,4 +5,6 @@ import com.han.auth.entity.User;
 public interface UserService {
 
     User getUserByUserName(String username);
+
+    int save(User user);
 }

@@ -40,6 +40,13 @@
 			<artifactId>java-jwt</artifactId>
 			<version>3.18.1</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.passay/passay -->
+		<dependency>
+			<groupId>org.passay</groupId>
+			<artifactId>passay</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
 
 
 		<dependency>

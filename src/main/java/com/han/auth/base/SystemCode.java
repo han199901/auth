@@ -1,6 +1,7 @@
 package com.han.auth.base;
 
 public enum SystemCode {
+
     /**
      * OK
      */
@@ -40,7 +41,17 @@ public enum SystemCode {
     /**
      * AccessDenied
      */
-    AccessDenied(502,"用户没有权限访问");
+    AccessDenied(502,"用户没有权限访问"),
+
+    /**
+     * 极光认证成功
+     */
+    JiguangVerifySuccess(8000,"认证成功"),
+
+    /**
+     * 极光认证失败
+     */
+    JiguangVerifyFailure(8001,"认证失败");
 
     int code;
     String message;

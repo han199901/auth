@@ -39,7 +39,26 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
+    public List<String> getUserRoleName(User user) {
+        List<Role> roleList = getUserRole(user);
+        List<String> listRoleName = new ArrayList<>();
+        roleList.forEach(item -> {
+            listRoleName.add(item.getName());
+        });
+        return listRoleName;
+    }
+
+    @Override
     public List<Role> getAllRole() {
         return roleMapper.selectAll();
+    }
+
+    @Override
+    public int setUserRole(User user, Role role) {
+        UserRole userRole = new UserRole();
+        userRole.setUid(user.getId());
+        userRole.setRid(role.getId());
+        userRoleMapper.insert(userRole);
+        return 0;
     }
 }

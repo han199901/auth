@@ -4,19 +4,24 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.han.auth.entity.Role;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.passay.CharacterData;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.PasswordGenerator;
 
 import java.util.*;
+
+import static org.passay.DictionarySubstringRule.ERROR_CODE;
 
 public class JwtTokenUtils {
     public static final String TOKEN_HEADER = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
 
     private static final Long EXPIRATION = 60 * 1000 * 30L; //过期时间30分钟
+    private static final Long LONG_EXPIRATION = 60 * 1000 * 60 * 24 * 7L; //一个星期
     private static final String SECRET = "Fm8oXFUSIrRDDC7VH3ccImCcNzLlQNgy";
     private static final String ISSUER = "com.han.ledger";
     private static final String ROLE = "role";
@@ -31,6 +36,17 @@ public class JwtTokenUtils {
                 .withIssuer(ISSUER)
                 .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION))
+                .sign(ALGORITHM);
+    }
+
+    //创建token
+    public static String createTokenWithLongTime(String username, List<String> roles){
+        return JWT.create()
+                .withClaim(USERNAME,username)
+                .withClaim(ROLE,roles)
+                .withIssuer(ISSUER)
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + LONG_EXPIRATION))
                 .sign(ALGORITHM);
     }
 
@@ -68,6 +84,37 @@ public class JwtTokenUtils {
             new JWTVerificationException("无法验证令牌");
         }
         return claims;
+    }
+
+    public static String generatePassayPassword() {
+        PasswordGenerator gen = new PasswordGenerator();
+        CharacterData lowerCaseChars = EnglishCharacterData.LowerCase;
+        CharacterRule lowerCaseRule = new CharacterRule(lowerCaseChars);
+        lowerCaseRule.setNumberOfCharacters(2);
+
+        CharacterData upperCaseChars = EnglishCharacterData.UpperCase;
+        CharacterRule upperCaseRule = new CharacterRule(upperCaseChars);
+        upperCaseRule.setNumberOfCharacters(2);
+
+        CharacterData digitChars = EnglishCharacterData.Digit;
+        CharacterRule digitRule = new CharacterRule(digitChars);
+        digitRule.setNumberOfCharacters(2);
+
+        CharacterData specialChars = new CharacterData() {
+            public String getErrorCode() {
+                return ERROR_CODE;
+            }
+
+            public String getCharacters() {
+                return "!@#$%^&*()_+";
+            }
+        };
+        CharacterRule splCharRule = new CharacterRule(specialChars);
+        splCharRule.setNumberOfCharacters(2);
+
+        String password = gen.generatePassword(16, splCharRule, lowerCaseRule,
+                upperCaseRule, digitRule);
+        return password;
     }
 
 
