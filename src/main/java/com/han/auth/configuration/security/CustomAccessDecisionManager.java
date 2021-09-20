@@ -21,7 +21,8 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
             if("ROLE_def".equals(configAttribute.getAttribute())) {
                 //匿名用户拒绝访问
                 if(authentication instanceof AnonymousAuthenticationToken) {
-                    throw new AccessDeniedException("权限不足，无法访问");
+//                    throw new AccessDeniedException("权限不足，无法访问");
+                    return;
                 } else {
                     //登录用户放行
                     return;
