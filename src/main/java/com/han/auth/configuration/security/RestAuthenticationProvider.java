@@ -41,13 +41,13 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         }
 
         boolean result = authenticationService.authUser(user, username, password);
-        if (false == user.getIsAccountNonLocked()) {
+        if (!user.getIsAccountNonLocked()) {
             throw new LockedException("用户被禁用");
         }
-        else if(false == user.getIsAccountNonExpired()) {
+        else if(!user.getIsAccountNonExpired()) {
             throw  new AccountExpiredException("账户过期");
         }
-        else if (false == user.getIsCredentialsNonExpired()) {
+        else if (!user.getIsCredentialsNonExpired()) {
             throw new CredentialsExpiredException("凭证已过期");
         }
         else if (!result) {

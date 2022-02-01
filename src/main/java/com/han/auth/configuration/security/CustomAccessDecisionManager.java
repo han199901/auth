@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
+import static com.han.auth.configuration.property.SystemCofing.ANONYMOUS_USER_ROLE;
+
 @Component
 public class CustomAccessDecisionManager implements AccessDecisionManager {
     @Override
@@ -18,7 +20,7 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
 
         for(ConfigAttribute configAttribute : collection) {
             //如果你请求的url在数据库中不具备角色，即不存在限制
-            if("ROLE_def".equals(configAttribute.getAttribute())) {
+            if(ANONYMOUS_USER_ROLE.equals(configAttribute.getAttribute())) {
                 //匿名用户拒绝访问
                 if(authentication instanceof AnonymousAuthenticationToken) {
 //                    throw new AccessDeniedException("权限不足，无法访问");

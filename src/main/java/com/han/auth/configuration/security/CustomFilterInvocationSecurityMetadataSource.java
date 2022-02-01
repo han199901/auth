@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.han.auth.configuration.property.SystemCofing.ANONYMOUS_USER_ROLE;
+
 @Component
 public class CustomFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
@@ -43,7 +45,7 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
         if(roles.size() != 0)
             return SecurityConfig.createList(roleStr);
         else
-            return SecurityConfig.createList("ROLE_def");
+            return SecurityConfig.createList(ANONYMOUS_USER_ROLE);
     }
 
     @Override

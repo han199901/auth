@@ -28,17 +28,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public boolean authUser(User user, String username, String password) {
         if(null == user)
             return false;
-        else if(!password.equals(user.getPassword())) {
-            return false;
-        }
-        return true;
+        else return password.equals(user.getPassword());
     }
 
     @Override
     public User registerUserWithPhone(String phone, int role) {
         List<Role> roleList = roleService.getAllRole();
-        for(int i=0; i<roleList.size(); i++) {
-            if(roleList.get(i).getId() == role) {
+        for (Role value : roleList) {
+            if (value.getId() == role) {
                 User user = new User();
                 user.setUsername(phone);
                 user.setIsAccountNonExpired(true);
@@ -46,10 +43,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 user.setIsCredentialsNonExpired(true);
                 user.setIsEnable(true);
                 user.setPassword(JwtTokenUtils.generatePassayPassword());
-                if(userService.save(user) == 1) {
+                if (userService.save(user) == 1) {
                     Role t = new Role();
                     t.setId(role);
-                    roleService.setUserRole(user,t);
+                    roleService.setUserRole(user, t);
                     return user;
                 } else {
                     return null;

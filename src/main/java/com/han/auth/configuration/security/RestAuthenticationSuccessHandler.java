@@ -1,7 +1,6 @@
 package com.han.auth.configuration.security;
 
 import com.han.auth.base.SystemCode;
-import com.han.auth.entity.Role;
 import com.han.auth.services.UserService;
 import com.han.auth.utils.JwtTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
             roleList.add(item.getAuthority());
         });
         Map<String, Object> map = new HashMap<>();
-        map.put("user", newUser);
+//        map.put("user", newUser);
         map.put(JwtTokenUtils.TOKEN_HEADER, JwtTokenUtils.TOKEN_PREFIX + JwtTokenUtils.createToken(newUser.getUsername(), roleList));
         RestUtil.response(response, SystemCode.OK.getCode(), SystemCode.OK.getMessage(), map);
     }
